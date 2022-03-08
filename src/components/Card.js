@@ -2,9 +2,23 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Card.css'
 
+function kelvinToCelsius(temp) {
+    return Math.round(temp - 273.15);
+}
+
+function celsiusToFahrenheit(celsius) {
+    return Math.round((celsius * 1.8) + 32);
+}
+
+function fahrenheitToCelsius(fahrenheit) {
+    return Math.round((fahrenheit -32) / 1.8);
+}
+
 const Card = () => {
     
     const [weather, setWeather] = useState({})
+    const [temperature, setTemperature] = useState()
+    const [isCelsius, setIsCelsius] = useState(true);
      const success = pos =>{
         const latitude = pos.coords.latitude;
         const longitude = pos.coords.longitude;
@@ -16,6 +30,9 @@ const Card = () => {
        
     }
    
+    useEffect(() => {
+        setTemperature(kelvinToCelsius(weather.main?.temp));
+    }, [weather])
       
     useEffect(() => {
     navigator.geolocation.getCurrentPosition(success);
@@ -38,8 +55,17 @@ const Card = () => {
                 <p>{`wind speed: ${weather.wind?.speed}km/h`}</p>
                 <p>{`Clouds: ${weather.clouds?.all}%`}</p>
                 <p>{`Pressure: ${weather.main?.pressure} mb`}</p>
-                <p>{Math.round(weather.main?.temp -273.15)}°C</p>               
-                <button className="button"> Convertion </button>
+                <p>{temperature}{isCelsius ? '°C' : '°F'}</p>               
+                <button className="button" onClick={() => {
+                    if (isCelsius) {
+                        setTemperature(celsiusToFahrenheit(temperature));
+                        setIsCelsius(!isCelsius);
+                    }
+                    if (!isCelsius) {
+                        setTemperature(fahrenheitToCelsius(temperature));
+                        setIsCelsius(!isCelsius);
+                    }
+                }}> Convertion </button>
                 </section>
         </div>
     );
